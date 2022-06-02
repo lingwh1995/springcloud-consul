@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Component
 @FeignClient(name="SPRINGCLOUD-PROVIDER-PAYMENT-SERVICE-CLUSTER")
 public interface PaymentServiceOpenFeign {
-    @PostMapping(value = "/payment/create")
+    @PostMapping(value = "/provider/payment/create")
     CommonResult create(@RequestBody Payment payment);
 
-    @GetMapping(value = "/payment/get/{id}")
+    @GetMapping(value = "/provider/payment/get/{id}")
     CommonResult<Payment> getPaymentById(@PathVariable("id") Long id);
 
-    @GetMapping(value = "/payment/feign/timeout")
+    @GetMapping(value = "/provider/payment/feign/timeout")
     String paymentFeignTimeout();
 }

@@ -1,0 +1,37 @@
+1.消费方/提供方搭建
+    1>.pom.xml引入依赖
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-consul-discovery</artifactId>
+        </dependency>
+    2>.yml添加配置
+       server:
+         port: 80
+
+       spring:
+         application:
+           name: SPRINGCLOUD-CONSUMER-HYSTRIX-LOADBALANCE-OPENFEIGN-CONFIGURATION-ORDER80 #注意:服务名不要出现_
+         devtools:
+           restart:
+             enabled: true
+         logging: #Spring运行日志配置
+           level: info
+         cloud:
+           consul:
+             host: localhost
+             port: 8500
+             discovery:
+               hostname: localhost #服务信息详细Address栏目显示的值,如果不配置,Address显示为当前计算机名称
+               service-name: ${spring.application.name}
+    3>.主启动类加注解:
+        @EnableDiscoveryClient
+    4>.Consul单节点访问路径
+        http://localhost:8500

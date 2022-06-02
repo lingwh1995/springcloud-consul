@@ -1,0 +1,53 @@
+1.项目SQL脚本
+    #创建数据库
+    CREATE DATABASE PAYMENT;
+    #创建表
+    CREATE TABLE `payment`(
+        `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+        `serial` varchar(200) DEFAULT '',
+        PRIMARY KEY(`id`)
+    )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+    #插入数据
+    INSERT INTO PAYMENT(ID,SERIAL) VALUES(1,'15646546546');
+2.查看SpringCloud和SpringBoot的版本对应关系
+    https://start.spring.io/actuator/info
+3.SpringCloud热部署
+    1>.父工程pom.xml添加:
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>2.6.4</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                            <goal>repackage</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <fork>true</fork>
+                        <addResources>true</addResources>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
+    2>.子工程pom.xml添加
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <!--是否依赖传递:true,依赖不传递,false:依赖传递,这是maven的特性,如果把热部署插件放在公共包中,则必须设置为false-->
+            <optional>false</optional>
+        </dependency>
+    3>.更改idea设置
+        Spring热部署-1.idea设置.png
+        Spring热部署-2.idea设置.png
+    4.SpringCloud热部署注意事项
+        开发阶段开启热部署,发布阶段一定要关闭热部署
+        在yml文件中配置:
+            使用热部署组件并且开启热部署功能:spring.devtools.restart.enabled: true
+            使用热部署组件但是不开启热部署功能:spring.devtools.restart.enabled: false
+4.微服务核心
+    实现高可用

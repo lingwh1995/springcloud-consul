@@ -33,34 +33,23 @@ public class OrderConsumerController {
     @Resource
     private RestTemplate restTemplate;
 
-    @Resource
-    private DiscoveryClient discoveryClient;
-
     @GetMapping("/consumer/payment/create")
     public CommonResult<Payment> create(Payment payment){
-        return restTemplate.postForObject(SERVICE_PROVIDER_URL +"/payment/create",payment, CommonResult.class);
+        return restTemplate.postForObject(SERVICE_PROVIDER_URL +"/provider/payment/create",payment, CommonResult.class);
     }
 
     @GetMapping("/consumer/payment/get/{id}")
     public CommonResult<Payment> getPayment(@PathVariable("id") Long id) {
-        return restTemplate.getForObject(SERVICE_PROVIDER_URL+"/payment/get/"+id,CommonResult.class);
+        return restTemplate.getForObject(SERVICE_PROVIDER_URL+"/provider/payment/get/"+id,CommonResult.class);
     }
 
     @GetMapping("/consumer/payment/getForEntity/{id}")
     public CommonResult<Payment> getPayment2(@PathVariable("id") Long id) {
-        ResponseEntity<CommonResult> entity = restTemplate.getForEntity(SERVICE_PROVIDER_URL+"/payment/get/"+id,CommonResult.class);
+        ResponseEntity<CommonResult> entity = restTemplate.getForEntity(SERVICE_PROVIDER_URL+"/provider/payment/get/"+id,CommonResult.class);
         if(entity.getStatusCode().is2xxSuccessful()){
             return entity.getBody();
         }else{
             return new CommonResult<>(444,"操作失败");
         }
     }
-
-    // ====================> zipkin+sleuth
-//    @GetMapping("/consumer/payment/zipkin")
-//    public String paymentZipkin()
-//    {
-//        String result = restTemplate.getForObject("http://localhost:8001"+"/payment/zipkin/", String.class);
-//        return result;
-//    }
 }

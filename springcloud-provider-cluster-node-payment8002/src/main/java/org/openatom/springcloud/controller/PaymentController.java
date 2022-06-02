@@ -30,7 +30,7 @@ public class PaymentController {
     @Resource
     private DiscoveryClient discoveryClient;
 
-    @PostMapping(value = "/payment/create")
+    @PostMapping(value = "/provider/payment/create")
     public CommonResult create(@RequestBody Payment payment) {
         int result = paymentService.create(payment);
         log.info("*****插入结果："+result);
@@ -41,7 +41,7 @@ public class PaymentController {
         }
     }
 
-    @GetMapping(value = "/payment/get/{id}")
+    @GetMapping(value = "/provider/payment/get/{id}")
     public CommonResult<Payment> getPaymentById(@PathVariable("id") Long id) {
         log.info(APPLICATION_NAME + serverPort);
         Payment payment = paymentService.getPaymentById(id);
@@ -52,20 +52,7 @@ public class PaymentController {
         }
     }
 
-    @GetMapping(value = "/payment/discovery")
-    public Object discovery() {
-        List<String> services = discoveryClient.getServices();
-        for (String element : services) {
-            log.info("*****element: "+element);
-        }
-        List<ServiceInstance> instances = discoveryClient.getInstances(APPLICATION_NAME);
-        for (ServiceInstance instance : instances) {
-            log.info(instance.getInstanceId()+"\t"+instance.getServiceId()+"\t"+instance.getHost()+"\t"+instance.getPort()+"\t"+instance.getUri());
-        }
-        return this.discoveryClient;
-    }
-
-    @GetMapping(value = "/payment/feign/timeout")
+    @GetMapping(value = "/provider/payment/feign/timeout")
     public String paymentFeignTimeout() {
         // 业务逻辑处理正确，但是需要耗费3秒钟
         try {
@@ -74,10 +61,5 @@ public class PaymentController {
             e.printStackTrace();
         }
         return serverPort;
-    }
-
-    @GetMapping("/payment/zipkin")
-    public String paymentZipkin() {
-        return "hi ,i'am paymentzipkin server fall back，welcome to atguigu，O(∩_∩)O哈哈~";
     }
 }

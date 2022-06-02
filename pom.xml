@@ -27,6 +27,8 @@
         <module>springcloud-consumer-loadbalance-openfeign-hardcode-order80</module>
         <!--Consul版服务消费者:1.使用OpenFeign实现负载均衡 2.YML配置方式实现负载均衡-->
         <module>springcloud-consumer-loadbalance-openfeign-configuration-order80</module>
+        <!--Consul版服务消费者:1.使用OpenFeign实现负载均衡 2.YML配置方式实现负载均衡 3.加入了Hystrix-->
+        <module>springcloud-consumer-hystrix-loadbalance-openfeign-configuration-order80</module>
         <!--Consul版服务提供者集群:服务提供者节点1-8001节点-->
         <module>springcloud-provider-cluster-node-payment8001</module>
         <!--Consul版服务提供者集群:服务提供者节点1-8002节点-->

@@ -1,0 +1,176 @@
+1.硬编码实现Ribbon负载均衡
+    1>.使用Ribbon自带的负载均衡算法
+        1>>.编写负载均衡算法类MySelfRule.java,注意:这个类所在的位置不要和主启动类在同一个包中
+            @Configuration
+            public class MySelfRule {
+                @Bean
+                public IRule myRule() {
+                    return new RandomRule();//定义为随机
+                }
+            }
+        2>>.容器中注入RestTemplate
+            @Configuration
+            public class ApplicationContextConfig {
+                @Bean
+                //必须加这个注解,不加这个注解访问会报错
+                @LoadBalanced
+                public RestTemplate getRestTemplate()
+                {
+                    return new RestTemplate();
+                }
+            }
+        3>>.主启动类添加注解
+            @RibbonClient(name = "SPRINGCLOUD-PROVIDER-PAYMENT-SERVICE-CLUSTER",configuration= MySelfRule.class)
+    2>.使用自定义的Ribbon负载均衡算法
+        1>>.编写负载均衡算法类MyRoundRobinRule.java,注意:这个类所在的位置不限制,能被容器加载就行
+            @Component
+            public class MyRoundRobinRule extends AbstractLoadBalancerRule {
+                public MyRoundRobinRule() {
+                }
+
+                @SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE"})
+                public Server choose(ILoadBalancer lb, Object key) {
+                    if (lb == null) {
+                        return null;
+                    } else {
+                        Server server = null;
+                        while(server == null) {
+                            if (Thread.interrupted()) {
+                                return null;
+                            }
+                            List<Server> upList = lb.getReachableServers();
+                            List<Server> allList = lb.getAllServers();
+                            int serverCount = allList.size();
+                            if (serverCount == 0) {
+                                return null;
+                            }
+                            int index = this.chooseRandomInt(serverCount);
+                            server = (Server)upList.get(index);
+                            if (server == null) {
+                                Thread.yield();
+                            } else {
+                                if (server.isAlive()) {
+                                    return server;
+                                }
+                                server = null;
+                                Thread.yield();
+                            }
+                        }
+                        return server;
+                    }
+                }
+
+                protected int chooseRandomInt(int serverCount) {
+                    return ThreadLocalRandom.current().nextInt(serverCount);
+                }
+
+                public Server choose(Object key) {
+                    return this.choose(this.getLoadBalancer(), key);
+                }
+
+                public void initWithNiwsConfig(IClientConfig clientConfig) {
+                }
+            }
+        2>>.容器中注入RestTemplate
+            @Configuration
+            public class ApplicationContextConfig {
+                @Bean
+                //必须加这个注解,不加这个注解访问会报错
+                @LoadBalanced
+                public RestTemplate getRestTemplate()
+                {
+                    return new RestTemplate();
+                }
+            }
+        3>>.主启动类添加注解
+            @RibbonClient(name = "SPRING-CLOUD-PROVIDER-EUREKA-PAYMENT-SERVICE",configuration= MyRoundRobinRule.class)
+2.YML文件配置实现Ribbon负载均衡
+    1>.使用Ribbon自带的负载均衡算法
+        1>>.容器中注入RestTemplate
+            @Configuration
+            public class ApplicationContextConfig {
+                @Bean
+                //必须加这个注解,不加这个注解访问会报错
+                @LoadBalanced
+                public RestTemplate getRestTemplate()
+                {
+                    return new RestTemplate();
+                }
+            }
+        2>>.YML中添加如下配置
+            #服务提供方注册名称
+            SPRINGCLOUD-PROVIDER-PAYMENT-SERVICE-CLUSTER: #服务提供方名称
+              ribbon:
+                NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule   #Ribbon负载均衡规则类所在的路径,自带七种规则,也可以是自定位规则的类所在的路径
+        3>>.主启动不用类添加注解
+    2>.使用自定义的Ribbon负载均衡算法
+        1>>.编写负载均衡算法类MyRoundRobinRule.java,注意:这个类所在的位置不限制,能被容器加载就行
+            @Component
+            public class MyRoundRobinRule extends AbstractLoadBalancerRule {
+                public MyRoundRobinRule() {
+                }
+
+                @SuppressWarnings({"RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE"})
+                public Server choose(ILoadBalancer lb, Object key) {
+                    if (lb == null) {
+                        return null;
+                    } else {
+                        Server server = null;
+                        while(server == null) {
+                            if (Thread.interrupted()) {
+                                return null;
+                            }
+                            List<Server> upList = lb.getReachableServers();
+                            List<Server> allList = lb.getAllServers();
+                            int serverCount = allList.size();
+                            if (serverCount == 0) {
+                                return null;
+                            }
+                            int index = this.chooseRandomInt(serverCount);
+                            server = (Server)upList.get(index);
+                            if (server == null) {
+                                Thread.yield();
+                            } else {
+                                if (server.isAlive()) {
+                                    return server;
+                                }
+                                server = null;
+                                Thread.yield();
+                            }
+                        }
+                        return server;
+                    }
+                }
+
+                protected int chooseRandomInt(int serverCount) {
+                    return ThreadLocalRandom.current().nextInt(serverCount);
+                }
+
+                public Server choose(Object key) {
+                    return this.choose(this.getLoadBalancer(), key);
+                }
+
+                public void initWithNiwsConfig(IClientConfig clientConfig) {
+                }
+            }
+        2>>.容器中注入RestTemplate
+            @Configuration
+            public class ApplicationContextConfig {
+                @Bean
+                //必须加这个注解,不加这个注解访问会报错
+                @LoadBalanced
+                public RestTemplate getRestTemplate()
+                {
+                    return new RestTemplate();
+                }
+            }
+        3>>.YML文件中添加配置
+            #服务提供方注册名称
+            SPRINGCLOUD-PROVIDER-PAYMENT-SERVICE-CLUSTER: #服务提供方名称
+              ribbon:
+                NFLoadBalancerRuleClassName: org.openatom.springcloud.loadbalance.MyRandomRule  #Ribbon负载均衡规则类所在的路径,自带七种规则,也可以是自定位规则的类所在的路径
+        3>>.主启动类不用添加注解
+3.所用RiBbon注意事项
+    不需要导入额外的依赖,spring-cloud-starter-netflix-eureka-client自带Ribbon
+4.Ribbon负载均衡测试地址
+    http://localhost/consumer/payment/get/1

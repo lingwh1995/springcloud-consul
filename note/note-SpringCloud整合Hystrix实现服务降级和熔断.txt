@@ -1,0 +1,206 @@
+1.Hystrix服务熔断:提供端和消费端都可以做
+    以消费端服务降级为例:
+    1>.pom添加依赖
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-actuator</artifactId>
+            </dependency>
+            <!--引入公共的工程-->
+            <dependency>
+                <groupId>org.openatom</groupId>
+                <artifactId>springcloud-api-commons</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-openfeign</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+            </dependency>
+        </dependencies>
+    2>.配置【消费端】YML文件
+          feign:
+            hystrix:
+              enabled: true #是否全局启动hystrix
+          hystrix:
+            command:
+              default:
+                execution:
+                  isolation:
+                    thread:
+                      timeoutInMilliseconds: 10000 # 设置hystrix的默认熔断超时时间为10000ms
+    3>.服务降级
+        1>>.为某一个方法编写降级方法(把降级处理和业务混合在一起,耦合度太高)
+            @HystrixCommand(fallbackMethod = "getPaymentByIdUseHystrixDegradationInConsumerFallback",
+                    //修改value值来分别测试提供方服务降级和消费方服务降级,要测试提供方服务降级将value值设置为大于5s,要测试消费方服务降级将value设置为小于5s,理论是这样,最好是设置为1s或2秒
+                    commandProperties = {@HystrixProperty(name="execution.isolation.thread.timeoutInMilliseconds",value="2000")})
+            @GetMapping("/consumer/payment/degradation_in_consumer/get/{id}")
+            public CommonResult<Payment> getPaymentByIdUseHystrixDegradationInConsumer(@PathVariable("id") Long id) {
+                return paymentServiceHystrixOpenFeign.getPaymentByIdUseHystrixDegradation(id);
+            }
+
+            public CommonResult<Payment> getPaymentByIdUseHystrixDegradationInConsumerFallback(Long id) {
+                Payment payment = new Payment(id,"服务消费:降级成功");
+                return new CommonResult(10000,"我是服务消费端",payment);
+            }
+        2>>.为某一个类中未设置降级的方法编写默认的降级方法(把降级处理和业务混合在一起,耦合度太高)
+            1>>>.Controller添加注解
+                @DefaultProperties(defaultFallback = "defaultGlobalFallback")
+            2>>>.编写默认的降级回调方法
+                /**
+                 * 测试默认的全局降级回调方法
+                 * 访问地址:
+                 *      http://localhost:/consumer/payment/degradation_in_consumer_default/get/1
+                 * @param id
+                 * @return
+                 */
+                @HystrixCommand
+                @GetMapping("/consumer/payment/degradation_in_consumer_default/get/{id}")
+                public CommonResult<Payment> getPaymentByIdOkTestDefaultGlobalCallback(@PathVariable("id") Long id) {
+                    //模拟发生了异常
+                    int i = 10/0;
+                    return paymentServiceHystrixOpenFeign.getPaymentByIdOk(id);
+                }
+
+                /**
+                 * 全局服务降级默认回调方法,未配置@HystrixCommand的方法失败后都会找这个方法
+                 *      用处:可以在这里设置发生了异常后,跳转到一个统一的用户界面
+                 *  特别注意:这个为全局服务降级兜底的方法不要有任何参数,否则会报错
+                 * @return
+                 */
+                public CommonResult<Payment> defaultGlobalFallback() {
+                    Payment payment = new Payment(null,"消费端:Hystrix全局服务降级....");
+                    return new CommonResult(10000,"我是消费端",payment);
+                }
+        3>>.为@FeignClient中的所有方法编写降级方法(把降级处理和业务分离,耦合度低)
+            1>>>.新建一个实现类,实现@FeignClient标注的接口,在这个实现类中编写降级方法
+                @Component
+                public class PaymentServiceHystrixOpenFeignImpl implements PaymentServiceHystrixOpenFeign {
+                    //不用这个测试方法,所以代码不做修改
+                    @Override
+                    public CommonResult create(Payment payment) {
+                        return null;
+                    }
+                    //不用这个测试方法,所以代码不做修改
+                    @Override
+                    public CommonResult<Payment> getPaymentByIdOk(Long id) {
+                        return null;
+                    }
+                    //不用这个测试方法,所以代码不做修改
+                    @Override
+                    public CommonResult<Payment> getPaymentByIdTimeout(Long id) {
+                        return null;
+                    }
+
+                    /**
+                     * 测试Hystrix在Service层进行服务降级
+                     * @param id
+                     * @return
+                     */
+                    @Override
+                    public CommonResult<Payment> getPaymentByIdUseHystrixDegradation(Long id) {
+                        Payment payment = new Payment(null,"消费端:Hystrix在Service层对所有服务进行服务降级....");
+                        return new CommonResult(10000,"发生了错误",payment);
+                    }
+
+                    //不用这个测试方法,所以代码不做修改
+                    @Override
+                    public CommonResult<Payment> getPaymentByIdOkHystrixCircuitBreaker(Long id) {
+                        return null;
+                    }
+                }
+            2>>>.修改接口上的@FeignClinet,修改为@FeignClient(name="SPRINGCLOUD-PROVIDER-PAYMENT-SERVICE-CLUSTER",fallback = PaymentServiceHystrixOpenFeignImpl.class)
+                添加了fallback的值
+2.Hystrix服务降级
+    以提供端服务熔断为例:
+    1>.pom添加依赖
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-actuator</artifactId>
+            </dependency>
+            <!--引入公共的工程-->
+            <dependency>
+                <groupId>org.openatom</groupId>
+                <artifactId>springcloud-api-commons</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-openfeign</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+            </dependency>
+        </dependencies>
+    2>.配置【消费端】YML文件
+        feign:
+          hystrix:
+            enabled: true #是否全局启动hystrix
+        hystrix:
+          command:
+            default:
+              execution:
+                isolation:
+                  thread:
+                    timeoutInMilliseconds: 10000 # 设置hystrix的默认熔断超时时间为10000ms
+    3>.服务降级
+        1>>.编写代码
+            /**
+             * 当下游服务(服务提供方)发生故障时对服务下游服务(服务提供方)进行降级
+             *  10内请求失败,失败率为60%时熔断服务
+             * @param id
+             * @return
+             */
+            @HystrixCommand(fallbackMethod = "getPaymentByIdUseHystrixCircuitBreakerFallback",commandProperties = {
+                    @HystrixProperty(name = "circuitBreaker.enabled",value = "true"),// 是否开启断路器
+                    @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold",value = "10"),// 请求次数
+                    @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds",value = "10000"), // 时间窗口期
+                    @HystrixProperty(name = "circuitBreaker.errorThresholdPercentage",value = "60"),// 失败率达到多少后跳闸
+            })
+            @Override
+            public Payment getPaymentByIdUseHystrixCircuitBreaker(Long id) {
+                //当ID小于0时,消费端使用不合理的参数多次调用此服务,则服务熔断
+                if(id<0){
+                    throw new RuntimeException("id不能小于0");
+                }
+                return paymentHystrixDao.getPaymentById(id);
+            }
+
+            /**
+             * 当方法getPaymentByIdUseHystrixCircuitBreaker()执行失败时,执行下面的方法
+             * @param id
+             * @return
+             */
+            public Payment getPaymentByIdUseHystrixCircuitBreakerFallback(Long id) {
+                return new Payment(id,"服务提供方:测试服务熔断成功");
+            }
+        2>>.测试服务熔断
+            模拟发生异常熔断服务:
+                路径1:    http://localhost/consumer/payment/circuitbreaker/get/-1
+            模拟不发生异常让服务自动恢复:
+                路径2:    http://localhost/consumer/payment/circuitbreaker/get/1
+            测试方式:先多次访问路径1，将服务熔断,再多次访问路径2,刚开始访问依然返回的是异常信息,多次访问后可以看到服务恢复正常
+3.服务降级和熔断的区别
+    服务降级:当服务调用发生异常时，快速返回一个事先设置好的值,针对系统全局稳定性考虑
+    服务熔断:当调用服务发生多次异常时服务会会熔断,如数据库连接故障,当故障修复时服务又会恢复到正常状态,针对服务提供方稳定性考虑
+5.服务熔断后恢复过程
+    服务熔断(下游服务发生了异常)->断路器半开(放开一定的访问流量,探测一下服务是否恢复正常)->断路器全开(放开全部访问流量)->服务恢复正常

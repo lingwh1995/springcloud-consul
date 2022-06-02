@@ -35,11 +35,4 @@ public class OrderConsumerController {
     public String paymentFeignTimeout() {
         return paymentServiceOpenFeign.paymentFeignTimeout();
     }
-    // ====================> zipkin+sleuth
-//    @GetMapping("/consumer/payment/zipkin")
-//    public String paymentZipkin()
-//    {
-//        String result = restTemplate.getForObject("http://localhost:8001"+"/payment/zipkin/", String.class);
-//        return result;
-//    }
 }
