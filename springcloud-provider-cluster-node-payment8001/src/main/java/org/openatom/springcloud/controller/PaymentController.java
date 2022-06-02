@@ -52,8 +52,8 @@ public class PaymentController {
         }
     }
 
-    @GetMapping(value = "/provider/payment/feign/timeout")
-    public String paymentFeignTimeout() {
+    @GetMapping(value = "/provider/payment/openfeign/timeout")
+    public String paymentOpenFeignTimeout() {
         // 业务逻辑处理正确，但是需要耗费3秒钟
         try {
             TimeUnit.SECONDS.sleep(3);
