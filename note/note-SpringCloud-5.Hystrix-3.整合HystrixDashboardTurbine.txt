@@ -1,0 +1,125 @@
+Hystrix DashBoard搭建
+    1>.Hystrix DashBoard Turbine项目中
+        1>>.pom添加依赖
+            <dependencies>
+                <dependency>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-starter-netflix-hystrix-dashboard</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-starter-netflix-turbine</artifactId>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.springframework.cloud</groupId>
+                            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-starter-consul-discovery</artifactId>
+                </dependency>
+            </dependencies>
+        2>>.配置YML文件
+             server:
+               port: 9002
+             spring:
+               application:
+                 name: SPRINGCLOUD-MOINTOR-HYSTRIX-HYSTRIX-DASHBOARD-TURBINE9002
+               cloud:
+                 consul:
+                   host: localhost
+                   port: 8500
+                   discovery:
+                     hostname: localhost #服务信息详细Address栏目显示的值,如果不配置,Address显示为当前计算机名称
+                     service-name: ${spring.application.name}
+                     #instance-id: ${spring:application:name}:${server:port}
+
+             turbine:
+               instanceUrlSuffix: /hystrix.stream
+               app-config: SPRINGCLOUD-PROVIDER-HYSTRIX-PAYMENT-SERVICE-CLUSTER   # 指定要监控的应用名称,可以写多个,用,隔开
+               clusterNameExpression: new String("default") #表示集群的名字为default
+               combine-host-port: true # 同一主机上的服务通过主机名和端口号的组合来进行区分，默认以host来区分,这个值为true这个同一个host上部署了几个相同的微服务,host值就是几,这个值为fasle,同一个host上不管部署几个微服务,值都是1
+        3>>.编写主启动类并添加注解
+            @EnableDiscoveryClient
+            @EnableTurbine
+            @SpringBootApplication
+            @EnableHystrixDashboard
+            public class MointorHystrixDashboardTurbine9002 {
+
+                public static void main(String[] args) {
+                    SpringApplication.run(MointorHystrixDashboardTurbine9002.class, args);
+                }
+
+            }
+    2>.被监控的项目
+        1>>.pom中添加配置
+             <dependencies>
+                 <dependency>
+                     <groupId>org.springframework.boot</groupId>
+                     <artifactId>spring-boot-starter-web</artifactId>
+                 </dependency>
+                 <dependency>
+                     <groupId>org.springframework.boot</groupId>
+                     <artifactId>spring-boot-starter-actuator</artifactId>
+                 </dependency>
+                 <dependency>
+                     <groupId>com.alibaba</groupId>
+                     <artifactId>druid-spring-boot-starter</artifactId>
+                 </dependency>
+                 <dependency>
+                     <groupId>org.mybatis.spring.boot</groupId>
+                     <artifactId>mybatis-spring-boot-starter</artifactId>
+                 </dependency>
+                 <dependency>
+                     <groupId>org.springframework.boot</groupId>
+                     <artifactId>spring-boot-starter-jdbc</artifactId>
+                 </dependency>
+                 <dependency>
+                     <groupId>mysql</groupId>
+                     <artifactId>mysql-connector-java</artifactId>
+                 </dependency>
+                 <!--引入公共的工程-->
+                 <dependency>
+                     <groupId>org.openatom</groupId>
+                     <artifactId>springcloud-api-commons</artifactId>
+                 </dependency>
+                 <dependency>
+                     <groupId>org.springframework.cloud</groupId>
+                     <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+                 </dependency>
+                 <dependency>
+                     <groupId>org.springframework.cloud</groupId>
+                     <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+                 </dependency>
+             </dependencies>
+        2>>.主启动类中添加下面代码,不添加这个的话Hystrix DashBoard中无法监控到流量访问信息
+            /**
+             *此配置是为了服务监控而配置，与服务容错本身无关，springcloud升级后的坑
+             *ServletRegistrationBean因为springboot的默认路径不是"/hystrix.stream"，
+             *只要在自己的项目里配置上下面的servlet就可以了
+             */
+            @Bean
+            public ServletRegistrationBean getServlet() {
+                HystrixMetricsStreamServlet streamServlet = new HystrixMetricsStreamServlet();
+                ServletRegistrationBean registrationBean = new ServletRegistrationBean(streamServlet);
+                registrationBean.setLoadOnStartup(1);
+                registrationBean.addUrlMappings("/hystrix.stream");
+                registrationBean.setName("HystrixMetricsStreamServlet");
+                return registrationBean;
+            }
+        3>>.主启动类添加注解
+            消费端:@EnableHystrix(在Hystrix环境成功搭建的基础上)
+            服务端:@EnableCircuitBreaker(在Hystrix环境成功搭建的基础上)
+    3>.查看效果
+        Hystrix DashBoard主界面:
+            http://localhost:9002/hystrix
+        监控服务提供端8003、8004集群
+            填写:http://localhost:9002/turbine.stream
+        填写后访问http://localhost/consumer/payment/circuitbreaker/get/1,会随机访问8003或者8004节点
+        ,然后刷新Hystrix DashBoard主界面即监控流量效访访问情况
+    4>.注意事项:
+        1.Hystrix DashBoard Turbine只能监控设置了服务降级或服务熔断的方法,未设置降级或者熔断的方法是无法监控到的,
+          也是说未设置降级和熔断的方法点击是不会和Hystrix DashBoard Turbine产生任何关系的
+        2.这个集成了Turbine的项目修改后需要手动重启,目前发现热加载会报错

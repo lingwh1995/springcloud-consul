@@ -1,0 +1,70 @@
+SpringCloud整合Consul搭建步骤
+注册中心搭建
+    1.官网下载Consul注册中心
+    2.配置环境变量
+    3.cmd->consul agent --dev启动Consul
+    4.访问注册中心:
+        http://localhost:8500
+服务消费端和服务提供端搭建
+    1>.pom.xml引入依赖
+         <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-actuator</artifactId>
+            </dependency>
+            <!--引入公共的工程-->
+            <dependency>
+                <groupId>org.openatom</groupId>
+                <artifactId>springcloud-api-commons</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-consul-discovery</artifactId>
+            </dependency>
+        </dependencies>
+    2>.编写yml
+        server:
+          port: 8004 #访问端口
+
+        spring:
+          application:
+            name: SPRINGCLOUD-PROVIDER-HYSTRIX-PAYMENT-SERVICE-CLUSTER #注意:服务名不要出现_
+          devtools: #热部署开关
+            restart:
+              enabled: true
+          logging:
+            level: info
+          cloud:
+            consul:
+              host: localhost
+              port: 8500
+              discovery:
+                hostname: localhost #服务信息详细Address栏目显示的值,如果不配置,Address显示为当前计算机名称
+                service-name: ${spring.application.name}
+
+          datasource:
+            type: com.alibaba.druid.pool.DruidDataSource            # 当前数据源操作类型
+            driver-class-name: org.gjt.mm.mysql.Driver              # mysql驱动包
+            url: jdbc:mysql://localhost:3306/payment?useUnicode=true&characterEncoding=utf-8&useSSL=false
+            username: root
+            password: 123456
+
+        mybatis:
+          mapperLocations: classpath:mapper/*.xml
+          type-aliases-package: org.openatom.springcloud.entities    # 所有Entity别名类所在包
+
+    3>.编写主启动类并添加注解
+        @EnableDiscoveryClient
+        @SpringBootApplication
+        public class PaymentServiceProviderHystrixClusterNode8004 {
+
+            public static void main(String[] args) {
+                SpringApplication.run(PaymentServiceProviderHystrixClusterNode8004.class, args);
+            }
+        }
+    4.访问地址
+        http://localhost/consumer/payment/get/1

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * OpenFeign硬编码实现远程调用
  */
 @Component
-@FeignClient(name="SPRINGCLOUD-PROVIDER-PAYMENT-SERVICE-CLUSTER",fallback = PaymentServiceHystrixOpenFeignImpl.class)
+@FeignClient(name="SPRINGCLOUD-PROVIDER-HYSTRIX-PAYMENT-SERVICE-CLUSTER",fallback = PaymentServiceHystrixOpenFeignImpl.class)
 public interface PaymentServiceHystrixOpenFeign {
     @PostMapping(value = "/provider/payment/create")
     CommonResult create(@RequestBody Payment payment);

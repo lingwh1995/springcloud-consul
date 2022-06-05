@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: SPRINGCLOUD-PROVIDER-PAYMENT-SERVICE-CLUSTER #注意:服务名不要出现_
+    name: SPRINGCLOUD-PROVIDER-HYSTRIX-PAYMENT-SERVICE-CLUSTER #注意:服务名不要出现_
   devtools: #热部署开关
     restart:
       enabled: true
@@ -17,12 +17,6 @@ spring:
         hostname: localhost #服务信息详细Address栏目显示的值,如果不配置,Address显示为当前计算机名称
         service-name: ${spring.application.name}
 
-#  zipkin:
-#      base-url: http://localhost:9411
-#  sleuth:
-#    sampler:
-#    #采样率值介于 0 到 1 之间，1 则表示全部采集
-#    probability: 1
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource            # 当前数据源操作类型
     driver-class-name: org.gjt.mm.mysql.Driver              # mysql驱动包

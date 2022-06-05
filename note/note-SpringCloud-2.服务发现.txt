@@ -1,11 +1,9 @@
 SpringCloud服务发现:
-1.注入依赖
-    @Resource
-    private DiscoveryClient discoveryClient;
-2.编写代码
+1.编写代码
     @RestController
     @Slf4j
     public class SpringCloudServiceDiscoveryController {
+
         @Resource
         private DiscoveryClient discoveryClient;
         //从配置文件中动态获取服务名称
@@ -25,7 +23,7 @@ SpringCloud服务发现:
             return this.discoveryClient;
         }
     }
-3.访问服务发现
+2.访问服务发现
     服务提供方服务发现:http://localhost:8001/provider/payment/discovery
     服务提供方服务发现:http://localhost:8002/provider/payment/discovery
     服务消费方服务发现:http://localhost/consumer/payment/discovery

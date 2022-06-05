@@ -33,6 +33,23 @@
         <module>springcloud-provider-cluster-node-payment8001</module>
         <!--Consul版服务提供者集群:服务提供者节点1-8002节点-->
         <module>springcloud-provider-cluster-node-payment8002</module>
+		<!--Consul版服务提供者集群:服务提供者节点1-8003节点 3.加入了Hystrix-->
+        <module>springcloud-provider-hystrix-cluster-node-payment8003</module>
+		<!--Consul版服务提供者集群:服务提供者节点2(带有熔断机制)-8004-->
+        <module>springcloud-provider-hystrix-cluster-node-payment8004</module>
+		<!--SpringCloud服务降级、服务熔断监控:监控单节点版-->
+        <module>springcloud-mointor-hystrix-dashboard9001</module>
+		<!--SpringCloud服务降级、服务熔断监控:监控集群多节点版-->
+        <module>springcloud-mointor-hystrix-dashboard9002</module>
+		<!--SpringCloud网关:1.直连模式 2.YML文件配置-->
+        <module>springcloud-router-connect-direct-configuration-gateway9527</module>
+        <!--SpringCloud网关:1.负载均衡模式 2.Java硬编码-->
+        <module>springcloud-router-connect-loadbalance-hardcore-gateway9527</module>
+        <!--SpringCloud网关:1.直连模式 2.Java硬编码-->
+        <module>springcloud-router-connect-direct-hardcore-gateway9527</module>
+        <!--SpringCloud网关:1.负载均衡模式 2.YML文件配置-->
+        <module>springcloud-router-connect-loadbalance-configuration-gateway9527</module>
+		
     </modules>
 
     <!-- 统一管理jar包版本 -->

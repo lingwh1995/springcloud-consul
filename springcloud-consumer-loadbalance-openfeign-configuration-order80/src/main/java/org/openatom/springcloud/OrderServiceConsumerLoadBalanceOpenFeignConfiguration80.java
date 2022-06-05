@@ -27,6 +27,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableFeignClients
 public class OrderServiceConsumerLoadBalanceOpenFeignConfiguration80 {
     public static void main(String[] args) {
-            SpringApplication.run(OrderServiceConsumerLoadBalanceOpenFeignConfiguration80.class, args);
+        SpringApplication.run(OrderServiceConsumerLoadBalanceOpenFeignConfiguration80.class, args);
     }
 }

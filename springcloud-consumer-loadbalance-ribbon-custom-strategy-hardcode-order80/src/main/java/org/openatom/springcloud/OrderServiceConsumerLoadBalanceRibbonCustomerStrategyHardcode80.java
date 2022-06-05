@@ -16,6 +16,6 @@ import org.springframework.cloud.netflix.ribbon.RibbonClient;
 public class OrderServiceConsumerLoadBalanceRibbonCustomerStrategyHardcode80 {
 
     public static void main(String[] args) {
-            SpringApplication.run(OrderServiceConsumerLoadBalanceRibbonCustomerStrategyHardcode80.class, args);
+        SpringApplication.run(OrderServiceConsumerLoadBalanceRibbonCustomerStrategyHardcode80.class, args);
     }
 }

@@ -1,0 +1,20 @@
+server:
+  port: 9002
+spring:
+  application:
+    name: SPRINGCLOUD-MOINTOR-HYSTRIX-HYSTRIX-DASHBOARD-TURBINE9002
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        hostname: localhost #服务信息详细Address栏目显示的值,如果不配置,Address显示为当前计算机名称
+        service-name: ${spring.application.name}
+        #instance-id: ${spring:application:name}:${server:port}
+
+turbine:
+  instanceUrlSuffix: /hystrix.stream
+  app-config: SPRINGCLOUD-PROVIDER-HYSTRIX-PAYMENT-SERVICE-CLUSTER   # 指定要监控的应用名称,可以写多个,用,隔开
+  clusterNameExpression: new String("default") #表示集群的名字为default
+  combine-host-port: true # 同一主机上的服务通过主机名和端口号的组合来进行区分，默认以host来区分,这个值为true这个同一个host上部署了几个相同的微服务,host值就是几,这个值为fasle,同一个host上不管部署几个微服务,值都是1
+

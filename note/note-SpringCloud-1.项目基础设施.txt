@@ -38,7 +38,13 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
-            <!--是否依赖传递:true,依赖不传递,false:依赖传递,这是maven的特性,如果把热部署插件放在公共包中,则必须设置为false-->
+            <!--
+                1.optional表示是否依赖传递:
+                    true:依赖不传递
+                    false:依赖传递
+                2.如果把热部署插件放在公共包中,则必须设置为false
+                3.到了项目上线阶段,在公共包中将optional设置为true,则所有引用到公共包的项目全部无法使用热部署功能
+            -->
             <optional>false</optional>
         </dependency>
     3>.更改idea设置
@@ -49,5 +55,18 @@
         在yml文件中配置:
             使用热部署组件并且开启热部署功能:spring.devtools.restart.enabled: true
             使用热部署组件但是不开启热部署功能:spring.devtools.restart.enabled: false
+    4.编写父pom.xml
+        定义各种依赖的版本号
 4.微服务核心
     实现高可用
+5.项目编写步骤:
+    1.父工程搭建
+    2.公共模块搭建
+    3.服务提供者8001、8002搭建
+    4.服务消费者:SpringCloud默认负载搭建
+    5.服务消费者:Ribbon负载搭建
+    6.OpenFeign负载均衡搭建
+    7.Hystrix服务降级、服务熔断搭建
+    8.HystrixDashBorad搭建
+    9.HystrixDashBoradTurbine搭建
+    10.SpringCloud网关gateway搭建

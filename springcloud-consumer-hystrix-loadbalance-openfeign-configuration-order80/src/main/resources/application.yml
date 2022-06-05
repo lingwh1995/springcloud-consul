@@ -16,8 +16,8 @@ spring:
       discovery:
         hostname: localhost #服务信息详细Address栏目显示的值,如果不配置,Address显示为当前计算机名称
         service-name: ${spring.application.name}
-#对Ribbon进行单独配置
-SPRINGCLOUD-PROVIDER-PAYMENT-SERVICE-CLUSTER: #服务提供方名称
+#通过对Ribbon的配置实现对OpenFeign的配置
+SPRINGCLOUD-PROVIDER-HYSTRIX-PAYMENT-SERVICE-CLUSTER: #服务提供方名称
   ribbon:
     NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule  #Ribbon负载均衡规则类所在的路径,自带七种规则,也可以是自定位规则的类所在的路径
 #对OpenFeign进行单独配置
@@ -25,7 +25,7 @@ feign:
   client:
     config:
       #这里填具体的服务名称（也可以填default，表示对所有服务生效）
-      SPRINGCLOUD-PROVIDER-PAYMENT-SERVICE-CLUSTER:  #服务提供方名称
+      SPRINGCLOUD-PROVIDER-HYSTRIX-PAYMENT-SERVICE-CLUSTER:  #服务提供方名称
         #connectTimeout和readTimeout这两个得一起配置才会生效
         connectTimeout: 10000  #指的是建立连接所用的时间，适用于网络状况正常的情况下,两端连接所用的时间
         readTimeout: 10000   #指的是建立连接后从服务器读取到可用资源所用的时间

@@ -16,14 +16,8 @@ spring:
       discovery:
         hostname: localhost #服务信息详细Address栏目显示的值,如果不配置,Address显示为当前计算机名称
         service-name: ${spring.application.name}
-  #  zipkin:
-#      base-url: http://localhost:9411
-#  sleuth:
-#    sampler:
-#    #采样率值介于 0 到 1 之间，1 则表示全部采集
-#    probability: 1
 
-#服务提供方注册名称
+#某个/某些服务的Ribbon配置
 SPRINGCLOUD-PROVIDER-PAYMENT-SERVICE-CLUSTER: #服务提供方名称
   ribbon:
     NFLoadBalancerRuleClassName: org.openatom.springcloud.loadbalance.MyRandomRule  #Ribbon负载均衡规则类所在的路径,自带七种规则,也可以是自定位规则的类所在的路径
