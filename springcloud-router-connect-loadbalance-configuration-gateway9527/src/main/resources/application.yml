@@ -26,12 +26,3 @@ spring:
         #  uri: http://localhost          #匹配后提供服务的路由地址
         #  predicates:
         #    - Path=/consumer/payment/**/get/**
-
-eureka:
-  instance:
-    hostname: ${spring.application.name}
-  client: #服务提供者provider注册进eureka服务列表内
-    service-url:
-      register-with-eureka: true
-      fetch-registry: true
-      defaultZone: http://localhost:7001/eureka

@@ -23,15 +23,13 @@ SpringCloud整合网关gateway实现路由转发、权限鉴定、限流、身�
             spring:
               application:
                 name: SPRINGCLOUD-ROUTER-CONNECT-DIRECT-HARDCODE-GATEWAY9527
-
-            eureka:
-              instance:
-                hostname: ${spring.application.name}
-              client: #服务提供者provider注册进eureka服务列表内
-                service-url:
-                  register-with-eureka: true
-                  fetch-registry: true
-                  defaultZone: http://localhost:7001/eureka
+              cloud:
+                consul:
+                  host: localhost
+                  port: 8500
+                  discovery:
+                    hostname: localhost #服务信息详细Address栏目显示的值,如果不配置,Address显示为当前计算机名称
+                    service-name: ${spring.application.name}
         3>>.编写路由规则类
             @Configuration
             public class GateWayConfig {
@@ -81,15 +79,12 @@ SpringCloud整合网关gateway实现路由转发、权限鉴定、限流、身�
                   discovery:
                     locator:
                       enabled: true #开启从注册中心动态创建路由的功能，利用微服务名进行路由
-
-            eureka:
-              instance:
-                hostname: ${spring.application.name}
-              client: #服务提供者provider注册进eureka服务列表内
-                service-url:
-                  register-with-eureka: true
-                  fetch-registry: true
-                  defaultZone: http://localhost:7001/eureka
+                consul:
+                  host: localhost
+                  port: 8500
+                  discovery:
+                    hostname: localhost #服务信息详细Address栏目显示的值,如果不配置,Address显示为当前计算机名称
+                    service-name: ${spring.application.name}
         3>>.编写路由规则类
             @Configuration
             public class GateWayConfig {
@@ -136,6 +131,12 @@ SpringCloud整合网关gateway实现路由转发、权限鉴定、限流、身�
               application:
                 name: SPRINGCLOUD-ROUTER-CONNECT-DIRECT-CONFIGURATION-GATEWAY9527
               cloud:
+                consul:
+                  host: localhost
+                  port: 8500
+                  discovery:
+                    hostname: localhost #服务信息详细Address栏目显示的值,如果不配置,Address显示为当前计算机名称
+                    service-name: ${spring.application.name}
                 gateway:
                   routes:
                     #第一个路由,多个路由依靠不同的路由ID区分
@@ -154,15 +155,6 @@ SpringCloud整合网关gateway实现路由转发、权限鉴定、限流、身�
                     #  uri: http://localhost          #匹配后提供服务的路由地址
                     #  predicates:
                     #    - Path=/consumer/payment/**/get/**
-
-            eureka:
-              instance:
-                hostname: ${spring.application.name}
-              client: #服务提供者provider注册进eureka服务列表内
-                service-url:
-                  register-with-eureka: true
-                  fetch-registry: true
-                  defaultZone: http://localhost:7001/eureka
 
         3>>.编写路主启动类
             @SpringBootApplication
@@ -196,6 +188,12 @@ SpringCloud整合网关gateway实现路由转发、权限鉴定、限流、身�
               application:
                 name: SPRINGCLOUD-ROUTER-CONNECT-LOADBALANCE-CONFIGURATION-GATEWAY9527
               cloud:
+                consul:
+                  host: localhost
+                  port: 8500
+                  discovery:
+                    hostname: localhost #服务信息详细Address栏目显示的值,如果不配置,Address显示为当前计算机名称
+                    service-name: ${spring.application.name}
                 gateway:
                   discovery:
                     locator:
@@ -218,14 +216,6 @@ SpringCloud整合网关gateway实现路由转发、权限鉴定、限流、身�
                     #  predicates:
                     #    - Path=/consumer/payment/**/get/**
 
-            eureka:
-              instance:
-                hostname: ${spring.application.name}
-              client: #服务提供者provider注册进eureka服务列表内
-                service-url:
-                  register-with-eureka: true
-                  fetch-registry: true
-                  defaultZone: http://localhost:7001/eureka
         3>>.编写路主启动类
             @SpringBootApplication
             @EnableDiscoveryClient
