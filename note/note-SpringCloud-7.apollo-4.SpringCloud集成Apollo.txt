@@ -81,7 +81,12 @@
 5.配置VM Options并启动测试程序
 	测试从Apollo中获取DEV环境相关配置:	-Denv=DEV -Dapollo.cacheDir=D:\repository\cache\apollo -Dapollo.cluster=DEFAULT
 	测试从Apollo中获取PRO环境相关配置：	-Denv=PRO -Dapollo.cacheDir=D:\repository\cache\apollo -Dapollo.cluster=DEFAULT
+    -DEV可以获取到DEV环境的参数,-PRO可以获取到PRO环境的参数
 6.测试Apollo配置中心
 	方式一:查看程序是否可以正常启动,可以正常启动则说明Apolo运行成功
 	方式二:访问	http://localhost/consumer/apollo/test 看是否能显示出应用名称,可以显示的话在Apollo中修改并发布后再次访问查看是否发生变化
-		
+    方式三：访问  http://localhost:8070   查看Apollo主页,点击项目查看是否出现了DEV和PRO两个环境
+7.注意事项:
+    1.启动好Apollo后再启动项目,因为项目的配置都是从Apollo中获取的
+    2.启动后访问   http://localhost:8070
+        如果只有DEV或只有PRO,就关闭PORTAL,把PROTAL单独重启一次
