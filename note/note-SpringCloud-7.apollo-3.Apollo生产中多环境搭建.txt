@@ -1,0 +1,53 @@
+1.准备数据库环境
+	说明:dev和pro环境的configService、adminService用到的数据库需要分别部署,dev和pro环境的protal可以连接到同一套数据库
+	1>.192.168.0.2的Mysql数据库相关操作:
+		1>>.下载工程,并在本地安装所有用到的依赖
+		2>>.修改apollo/scripts/flyway/flyway-configdb.properties和apollo/scripts/flyway/flyway-portaldb.properties中数据库相关配置
+			  特别注意:如果报了相关的错,给数据库连接信息后面加上&allowPublicKeyRetrieval=true
+		3>>.修改apollo/scripts/build.bat中的数据库联连接信息
+		4>>.在apollo文件夹下执行如下两个命令；目的是使用flyway脚本自动创建好数据库环境
+			 mvn -N -Pconfigdb flyway:migrate
+			 mvn -N -Pportaldb flyway:migrate
+	2>.192.168.0.3的Mysql数据库相关操作/或者直接克隆虚拟机环境也可以快速建立dev环境pro环境用到的数据库:	
+		1>.在上个步骤执行完成的情况下,将apollo/scripts/flyway/flyway-configdb.properties中数据库连接信息修改为192.168.0.3
+		2>.在apollo文件夹下执行如下命令:	mvn -N -Pconfigdb flyway:migrate
+		3>.数据库创建好之后在ApolloConfigDB库中执行:	UPDATE ServerConfig SET `Value` = "http://localhost:8081/eureka/" WHERE `key` = "eureka.service.url";	
+2.创建可以一次启动两个configService、adminService一个portal的文件夹,并在其中编写run.bat	
+	1>.创建Apollo2.0.1_multiply_environment文件夹
+	2>.在文件夹Apollo2.0.1_multiply_environment中创建environments和logs文件夹
+	3>.在environments中创建environment_dev和environment_pro两个文件夹,并且分别给每个文件夹中放入apollo-adminservice-2.0.1.jar和apollo-configservice-2.0.1.jar
+	4>.在logs中创建apollo-adminservice-dev.log、apollo-adminservice-dev-pro.log、apollo-configservice-dev.log、apollo-configservice-dev-pro.log、apollo-portal.log
+	5>.给Apollo2.0.1_multiply_environment放入apollo-portal-2.0.1.jar
+	6>.在文件夹Apollo2.0.1_multiply_environment中创建run.bat这个文件,在里面编写运行脚本，内容如下:
+		echo "开始启动apollo"
+
+		#dev环境数据库连接信息
+		set url_dev="192.168.0.2:3306"
+		set username_dev="root"
+		set password_dev="123456"
+		#pro环境数据库连接信息
+		set url_pro="192.168.0.3:3306"
+		set username_pro="root"
+		set password_pro="123456"
+
+		#启动dev环境configService
+		start "configService" java -Dapollo_profile=github -Dspring.datasource.url=jdbc:mysql://%url_dev%/ApolloConfigDB?characterEncoding=utf8 -Dspring.datasource.username=%username_dev% -Dspring.datasource.password=%password_dev% -Dlogging.file=.\logs\apollo-configservice-dev.log -jar .\environments\environment_dev\apollo-configservice-2.0.1.jar
+		#启动dev环境adminService
+		start "adminService" java -Dapollo_profile=github -Dspring.datasource.url=jdbc:mysql://%url_dev%/ApolloConfigDB?characterEncoding=utf8 -Dspring.datasource.username=%username_dev% -Dspring.datasource.password=%password_dev% -Dlogging.file=.\logs\apollo-adminservice-dev.log -jar .\environments\environment_dev\apollo-adminservice-2.0.1.jar
+		#启动dev环境configService
+		start "configService" java -Dapollo_profile=github -DServer.port=8081 -Dspring.datasource.url=jdbc:mysql://%url_pro%/ApolloConfigDB?characterEncoding=utf8 -Dspring.datasource.username=%username_pro% -Dspring.datasource.password=%password_pro% -Dlogging.file=.\logs\apollo-configservice-dev.log -jar .\environments\environment_dev\apollo-configservice-2.0.1.jar
+		#启动dev环境adminService
+		start "adminService" java -Dapollo_profile=github -DServer.port=8091 -Deureka.client.register-with-eureka.service-url.defaultZone=http://localhost:8081/eureka -Dspring.datasource.url=jdbc:mysql://%url_pro%/ApolloConfigDB?characterEncoding=utf8 -Dspring.datasource.username=%username_pro% -Dspring.datasource.password=%password_pro% -Dlogging.file=.\logs\apollo-adminservice-dev.log -jar .\environments\environment_dev\apollo-adminservice-2.0.1.jar
+		#启动portal
+		start "ApolloPortal" java -Dapollo_profile=github,auth -Ddev_meta=http://localhost:8080/ -Dpro_meta=http://localhost:8081/ -Dserver.port=8070 -Dspring.datasource.url=jdbc:mysql://%url_dev%/ApolloPortalDB?characterEncoding=utf8 -Dspring.datasource.username=%username_dev% -Dspring.datasource.password=%password_dev% -Dlogging.file=.\logs\apollo-portal.log -jar .\apollo-portal-2.0.1.jar
+	7>.双击运行Apollo2.0.1_multiply_environment下run.bat启动两个DEV环境、两个PRO环境和一个Portal
+3.访问地址:
+	EUREKA1:	http://localhost:8080/
+	EUREKA2:	http://localhost:8081/
+	portal:		http://localhost:8070/
+4.访问http://localhost:8070/,进入Apollo配置界面
+	1>.登录用户名/密码:	apollo/admin
+	2>.管理员工具->系统参数->输入key值: 
+		添加新部门:	[{"orgId":"TEST1","orgName":"样例部门1"},{"orgId":"TEST2","orgName":"样例部门2"},{"orgId":"micro_service","orgName":"微服务部门"}]
+		可支持的环境列表:	dev,pro
+	3>.创建应用
