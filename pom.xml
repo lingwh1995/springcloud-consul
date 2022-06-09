@@ -55,9 +55,9 @@
 		<!--SpringCloud网关:1.直连模式 2.YML文件配置-->
         <module>springcloud-router-connect-direct-configuration-gateway9527</module>
         <!--SpringCloud网关:1.负载均衡模式 2.Java硬编码-->
-        <module>springcloud-router-connect-loadbalance-hardcore-gateway9527</module>
+        <module>springcloud-router-connect-loadbalance-hardcode-gateway9527</module>
         <!--SpringCloud网关:1.直连模式 2.Java硬编码-->
-        <module>springcloud-router-connect-direct-hardcore-gateway9527</module>
+        <module>springcloud-router-connect-direct-hardcode-gateway9527</module>
         <!--SpringCloud网关:1.负载均衡模式 2.YML文件配置-->
         <module>springcloud-router-connect-loadbalance-configuration-gateway9527</module>
     </modules>

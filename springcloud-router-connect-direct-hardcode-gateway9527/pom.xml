@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>springcloud-router-connect-direct-hardcore-gateway9527</artifactId>
+    <artifactId>springcloud-router-connect-direct-hardcode-gateway9527</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
