@@ -5,3 +5,12 @@ apollo:
   bootstrap:
     enabled: true
     namespaces: application #多个namespaces之间使用,隔开
+
+server:
+  tomcat:
+    mbeanregistry:
+      enabled: true
+management:
+  endpoint:
+    restart:
+      enabled: true
