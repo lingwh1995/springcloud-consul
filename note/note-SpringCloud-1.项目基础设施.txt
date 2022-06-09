@@ -59,7 +59,31 @@
         定义各种依赖的版本号
 4.微服务核心
     实现高可用
-5.项目编写步骤:
+5.链路所有组件
+    1>.注册中心
+        1>.Eureka
+        2>.Consul
+        3>.Zookeeper
+    2>.远程调用+负载均衡:
+        1>.SpringCloud默认
+        2>.Ribbon
+        3>.OpenFeign
+    3>.服务降级/服务熔断
+        Hystrix
+    4>.服务监控
+        Hystrix监控技术
+        1>.单节点:
+            Hystrix-Dashbord
+        2>.多节点:
+            Hystrix-Dashbord-Turbine
+    5>.路由网关
+        spring-cloud-gateway
+    6>.配置中心
+        1>.Apollo
+        2>.Spring Cloud Config
+    7>.服务调用链路追踪
+        Seluth+Zipkin
+6.项目编写步骤:
     1.父工程搭建
     2.公共模块搭建
     3.基础服务提供者8001(服务提供者)、8002(服务提供者)搭建
