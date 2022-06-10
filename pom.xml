@@ -30,7 +30,7 @@
         <!--Consul版服务消费者:1.使用OpenFeign实现负载均衡 2.YML配置方式实现负载均衡 3.加入了Hystrix-->
         <module>springcloud-consumer-hystrix-loadbalance-openfeign-configuration-order80</module>
         <!--Consul版服务消费者:1.使用OpenFeign实现负载均衡 2.使用了apollo配置中心-->
-        <module>springcloud-consumer-apollo-loadbalance-openfeign-configuration-order80</module>
+        <module>springcloud-config-apollo-loadbalance-openfeign-configuration-order80</module>
         <!--Consul版服务消费者:1.使用SpringCloud默认负载均衡 2.使用了Sleuth和Zipkin -->
         <module>springcloud-consumer-sleuth_zipkin-loadbalance-default-order80</module>
 
