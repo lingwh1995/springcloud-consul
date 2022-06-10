@@ -12,29 +12,9 @@
 2.查看SpringCloud和SpringBoot的版本对应关系
     https://start.spring.io/actuator/info
 3.SpringCloud热部署
-    1>.父工程pom.xml添加:
-        <build>
-            <plugins>
-                <plugin>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>2.6.4</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                            <goal>repackage</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <fork>true</fork>
-                        <addResources>true</addResources>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </build>
-    2>.子工程pom.xml添加
-        <dependency>
+    1>.pom.xml中添加:
+        <!--热部署依赖-->
+         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
@@ -47,10 +27,33 @@
             -->
             <optional>false</optional>
         </dependency>
-    3>.更改idea设置
+        <!--热部署插件设置-->
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>2.6.4</version>
+                    <!--如果打包有主启动类,加上这段配置(工具包没有主启动类,就不用加这段配置):开始-->
+                    <executions>
+                        <execution>
+                            <goals>
+                            <goal>repackage</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <!--如果打包有主启动类,加上这段配置(工具包没有主启动类,就不用加这段配置):结束-->
+                    <configuration>
+                        <fork>true</fork>
+                        <addResources>true</addResources>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
+    2>.更改idea设置
         Spring热部署-1.idea设置.png
         Spring热部署-2.idea设置.png
-    4.SpringCloud热部署注意事项
+    3.SpringCloud热部署注意事项
         开发阶段开启热部署,发布阶段一定要关闭热部署
         在yml文件中配置:
             使用热部署组件并且开启热部署功能:spring.devtools.restart.enabled: true
