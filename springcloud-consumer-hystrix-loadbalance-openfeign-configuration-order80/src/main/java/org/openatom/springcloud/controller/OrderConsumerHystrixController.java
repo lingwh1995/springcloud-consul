@@ -114,7 +114,7 @@ public class OrderConsumerHystrixController {
     }
 
     /**
-     * 全局服务降级默认回调方法,只添加了@HystrixCommand的方法失败后都会找这个方法
+     * 全局服务降级默认回调方法,只添加了@HystrixCommand,未做关于@HystrixCommand详细配置的方法失败后都会找这个方法
      *      用处:可以在这里设置发生了异常后,跳转到一个统一的用户界面
      *  特别注意:这个为全局服务降级兜底的方法不要有任何参数,否则会报错
      * @return
