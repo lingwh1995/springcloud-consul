@@ -76,7 +76,7 @@
         <spring.cloud.version>Hoxton.SR1</spring.cloud.version>
         <mybatis.spring.boot.version>1.3.0</mybatis.spring.boot.version>
         <org.openatom.api.commons.version>1.0-SNAPSHOT</org.openatom.api.commons.version>
-        <com.ctrip.framework.apollo.apollo-client.version>2.0.1-SNAPSHOT</com.ctrip.framework.apollo.apollo-client.version>
+        <com.ctrip.framework.apollo.apollo-client.version>2.0.1</com.ctrip.framework.apollo.apollo-client.version>
     </properties>
 
     <!-- 子模块继承之后，提供作用：锁定版本+子modlue不用写groupId和version  -->
