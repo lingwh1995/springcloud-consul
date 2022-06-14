@@ -12,7 +12,7 @@ spring:
           uri: http://localhost          #匹配后提供服务的路由地址
           predicates:
             # 断言，路径相匹配的进行路由,可以匹配下面四个路径:
-            # 路径1:http://localhost:9527/consumer/payment/out/get/{id}
+            # 路径1:http://localhost:9527/consumer/payment/ok/get/{id}
             # 路径2:http://localhost:9527/consumer/payment/timeout/get/{id}
             # 路径3:http://localhost:9527/consumer/payment/degradation_in_provider/get/{id}
             # 路径3:http://localhost:9527/consumer/payment/circuitbreaker/get/{id}
