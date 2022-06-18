@@ -63,7 +63,7 @@
 
         <module>springcloud-consumer-seata-loadbalance-openfeign-configuration-order80</module>
         <module>springcloud-provider-seata-account8007</module>
-        <module>springcloud-provider-seata-storaget8008</module>
+        <module>springcloud-provider-seata-storage8008</module>
     </modules>
 
     <!-- 统一管理jar包版本 -->
