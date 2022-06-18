@@ -70,7 +70,7 @@
 	}	
 4.编写主启动类并添加注解
 	@EnableApolloConfig
-	@EnableEurekaClient  //添加@EnableEurekaClient好像没什么用,但是还是加上
+	@EnableDiscoveryClient
 	@SpringBootApplication
 	@EnableFeignClients
 	public class OrderServiceConsumerApolloLoadBalanceOpenFeignConfiguration80 {
