@@ -1,0 +1,79 @@
+server:
+  port: 8008
+  tomcat:
+    mbeanregistry:
+      enabled: true
+spring:
+  application:
+    name: SPRINGCLOUD-PROVIDER-SEATA-STORAGE8008 #注意:服务名不要出现_
+  devtools:
+    restart:
+      enabled: true
+  logging: #Spring运行日志配置
+    level: info
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        hostname: localhost #服务信息详细Address栏目显示的值,如果不配置,Address显示为当前计算机名称
+        service-name: ${spring.application.name}
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource            # 当前数据源操作类型
+    driver-class-name: com.mysql.cj.jdbc.Driver             # mysql驱动包
+    url: jdbc:mysql://192.168.0.2:3306/seata_storage
+    username: root
+    password: 123456
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    restart:
+      enabled: true
+
+logging:
+  level:
+    io:
+      seata: info
+mybatis:
+  mapperLocations: classpath:mapper/*.xml
+  type-aliases-package: org.openatom.springcloud.entities    # 所有Entity别名类所在包
+
+app:
+  id: springcloud-seata
+apollo:
+  bootstrap:
+    enabled: true
+    namespaces: seata-storage #多个namespaces之间使用,隔开
+
+#所有服务信息:这是自定义的节点,和seata和项目无关
+service:
+  seata-server:
+    name: seata-server
+#所有服务信息:这是自定义的节点,和seata和项目无关
+seata:
+  enabled: true
+  application-id: seata-storge
+  # 客户端和服务端在同一个事务组
+  tx-service-group: my_test_tx_group
+  # 事务群组,配置项值为TC集群名,需要与服务端在Eureka中注册时使用的应用名称保持一致
+  service:
+    vgroup-mapping.my_test_tx_group: ${service.seata-server.name}
+  config:
+    type: apollo
+    apollo:
+      seata: default
+      cluster: default
+      appId: ${app.id}
+      apolloMeta: http://localhost:8080
+      apolloConfigService: http://localhost:8080
+      namespace: ${service.seata-server.name}
+  registry:
+    type: consul
+    consul:
+      cluster: seata-server
+      server-addr: localhost:8500
+      aclToken:

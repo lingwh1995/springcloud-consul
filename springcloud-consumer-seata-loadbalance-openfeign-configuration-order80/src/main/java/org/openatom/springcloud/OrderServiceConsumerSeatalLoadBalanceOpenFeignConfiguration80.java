@@ -3,6 +3,7 @@ package org.openatom.springcloud;
 import com.ctrip.framework.apollo.spring.annotation.EnableApolloConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
@@ -23,24 +24,22 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  *      2022-06-01 03:51:37.176 DEBUG 16792 --- [p-nio-80-exec-1] o.o.s.services.PaymentServiceOpenFeign   : [PaymentServiceOpenFeign#getPaymentById] {"code":200,"message":"查询成功,serverPort:  8006","data":{"id":1,"serial":"15646546546"}}
  *      2022-06-01 03:51:37.176 DEBUG 16792 --- [p-nio-80-exec-1] o.o.s.services.PaymentServiceOpenFeign   : [PaymentServiceOpenFeign#getPaymentById] <--- END HTTP (94-byte body)
  */
-/**
- * 支付接口提供者
- * 使用Eureka作为注册中心+使用Apollo作为注册中心
- * 运行时要添加如下VM Options:
- *      获取DEV环境数据:
- *          -Denv=DEV -Dapollo.cacheDir=D:\repository\cache\apollo -Dapollo.cluster=DEFAULT
- *      获取PRO环境数据:
- *          -Denv=PRO -Dapollo.cacheDir=D:\repository\cache\apollo -Dapollo.cluster=DEFAULT
- */
 @EnableApolloConfig
 @EnableDiscoveryClient
-@SpringBootApplication
+@SpringBootApplication(exclude = DataSourceAutoConfiguration.class)//取消数据源的自动创建
 @EnableFeignClients
-public class OrderServiceConsumerApolloLoadBalanceOpenFeignConfiguration80 {
+public class OrderServiceConsumerSeatalLoadBalanceOpenFeignConfiguration80 {
     public static void main(String[] args) {
+        /**
+         * 注意:
+         *  1.下面的启动参数要以seata-server中的registry.conf中config.apollo{}的配置为准
+         *  2.这里的配置其实和yml中以及seata-server中的registry.conf中config.apollo{}的配置是一致的
+         */
         System.setProperty("env","dev");
-        System.setProperty("apollo.cacheDir","D:\\repository\\cache\\apollo");
-        System.setProperty("apollo.cluster","dafult");
-        SpringApplication.run(OrderServiceConsumerApolloLoadBalanceOpenFeignConfiguration80.class, args);
+        System.setProperty("seata","default");
+        System.setProperty("apollo.cluster","default");
+        System.setProperty("seata.config.apollo.namespace","seata-server");
+        System.setProperty("apolloConfigService","dafult");
+        SpringApplication.run(OrderServiceConsumerSeatalLoadBalanceOpenFeignConfiguration80.class, args);
     }
 }
