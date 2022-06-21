@@ -2,8 +2,8 @@
     本地事务和seata事务的区别:
         本地事务只可以在同一台机器的同一个mysql中进行操作,seata事务可以跨机器进行事务控制
 单机版:(使用eureka作为注册中心+使用apollo作为配置中心)
-1.修改registry.conf
-    进入seata-server-1.4.2\conf\registry.conf
+1.修改registry.conf和file.conf
+    1>.进入seata-server-1.4.2\conf\registry.conf
         registry {
           # 使用什么作为注册中心：file 、nacos 、eureka、redis、zk、consul、etcd3、sofa
           type = "eureka"
@@ -24,6 +24,9 @@
             aclToken = ""
           }
         }
+    2>.修改file.conf中配置(当开始事务时可以在数据库中查询到事务日志)
+        修改mode为db
+        修改数据库连接信息
 2.启动apollo
     根据registry.conf中config{apollo}在Apollo控制台中创建项目(springcloud-seata)+集群(default)+命名空间(seata-server)
 3.在源码中找到config.txt,修改后将配置放入刚才的命名空间seata-server中,然后发布配置
