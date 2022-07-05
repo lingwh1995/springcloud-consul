@@ -16,8 +16,8 @@ pipeline {
       steps {
         echo '正在推送文件...'
         echo '${GIT_COMMIT_MSG}'
-        sh 'git fetch https://lingwh1995:04cacc5f135e93b1ed679462a55260b7@gitee.com/lingwh1995/springcloud-consul.git'
-        sh 'git push -f https://lingwh1995:04cacc5f135e93b1ed679462a55260b7@gitee.com/lingwh1995/springcloud-consul.git HEAD:master'
+        sh 'git fetch https://lingwh1995:${GITEE_TOKEN}@gitee.com/lingwh1995/springcloud-consul.git'
+        sh 'git push -f https://lingwh1995:${GITEE_TOKEN}@gitee.com/lingwh1995/springcloud-consul.git HEAD:master'
         //sh 'git fetch https://lingwh1995:SHA256:uz0ofaRFso8yu2Uv4/muvtv+U59/U7+XZiZ+HM630Ns@github.com/lingwh1995/springcloud-consul.git'
         //sh 'git push -f https://lingwh1995:SHA256:uz0ofaRFso8yu2Uv4/muvtv+U59/U7+XZiZ+HM630Ns@github.com/lingwh1995/springcloud-consul.git HEAD:master'
         echo '完成文件推送...'
